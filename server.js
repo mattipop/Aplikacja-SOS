@@ -8,12 +8,11 @@ const PORT = process.env.PORT || 3000;
 
 const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
-const phoneNumbers = [
-  '+31621308158',
-];
+// This is your single target number
+const recipientNumber = '+31621308158';
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json()); // Required to parse JSON body
+app.use(express.json());
 
 app.post('/send-sms', async (req, res) => {
   const { latitude, longitude } = req.body;
@@ -26,17 +25,13 @@ app.post('/send-sms', async (req, res) => {
   const message = `test\nLocation: ${googleMapsLink}`;
 
   try {
-    const results = await Promise.all(
-      phoneNumbers.map(number =>
-        client.messages.create({
-          body: message,
-          from: process.env.TWILIO_PHONE_NUMBER,
-          to: number
-        })
-      )
-    );
+    const result = await client.messages.create({
+      body: message,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: recipientNumber
+    });
 
-    console.log('Messages sent:', results.map(msg => msg.sid));
+    console.log('Message sent:', result.sid);
     res.status(200).send('SMS with location sent');
   } catch (error) {
     console.error('Error sending SMS:', error);
