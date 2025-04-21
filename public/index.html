@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aplikacja SOS</title>
-  <link rel="icon" type="image/png" href="favicon.ico">
+  <title>Big Red Button</title>
+  <link rel="icon" type="image/png" href="favicon.png">
   <style>
     body {
       background-color: #ffffff;
@@ -38,34 +38,13 @@
 
   <script>
     document.getElementById('big-red-button').addEventListener('click', async () => {
-      if (!navigator.geolocation) {
-        alert('Geolocation is not supported by your browser.');
-        return;
+      const res = await fetch('/send-sms', { method: 'POST' });
+      if (res.ok) {
+        alert('SMS sent!');
+      } else {
+        alert('Failed to send SMS.');
       }
-  
-      navigator.geolocation.getCurrentPosition(async position => {
-        const coords = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        };
-  
-        const res = await fetch('/send-sms', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(coords)
-        });
-  
-        if (res.ok) {
-          alert('Location SMS sent!');
-        } else {
-          alert('Failed to send SMS.');
-        }
-      }, () => {
-        alert('Unable to retrieve your location.');
-      });
     });
-  </script>  
+  </script>
 </body>
 </html>
